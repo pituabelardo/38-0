@@ -185,7 +185,11 @@ h1,h2,h3{font-weight:400;line-height:.95;}
 .game__body{display:grid;grid-template-columns:minmax(340px,460px) minmax(420px,1fr);align-items:stretch;min-height:0;max-width:1180px;margin:0 auto;width:100%;}
 .game__pitch-col{display:flex;flex-direction:column;align-items:center;justify-content:center;padding:18px 24px;border-right:1px solid var(--border);background:rgba(5,7,15,.3);gap:6px;}
 .game__pitch-title{font-family:'Rajdhani',sans-serif;font-weight:600;font-size:11px;letter-spacing:.2em;text-transform:uppercase;color:var(--subtle);margin-bottom:10px;}
-.pitch-context{display:none;}
+/* Cabecera del equipo SIEMPRE visible sobre el campo (máxima jerarquía):
+   "EQUIPO · DÉCADA" en grande + descripción debajo. */
+.pitch-heading{text-align:center;width:100%;margin-bottom:4px;}
+.pitch-heading__team{font-family:'Bebas Neue',sans-serif;font-size:30px;line-height:.96;letter-spacing:.01em;color:#f7f9ff;}
+.pitch-heading__era{font-size:12.5px;color:var(--muted);margin-top:4px;line-height:1.2;}
 .live-pitch{position:relative;width:100%;max-width:384px;aspect-ratio:2/3;border-radius:var(--r-lg);overflow:hidden;background:radial-gradient(ellipse at 50% 40%,rgba(255,255,255,.04),transparent 65%),repeating-linear-gradient(118deg,transparent 0 26px,rgba(255,255,255,.015) 26px 52px),var(--pitch);border:1px solid rgba(255,255,255,.08);}
 .live-pitch__lines{position:absolute;inset:12px;border:1.5px solid var(--pitch-line);border-radius:3px;}
 .live-pitch__halfway{position:absolute;left:12px;right:12px;top:50%;height:1.5px;background:var(--pitch-line);}
@@ -222,7 +226,8 @@ h1,h2,h3{font-weight:400;line-height:.95;}
 
 .revealed-stage{display:flex;flex-direction:column;flex:1;min-height:0;}
 .revealed-header{padding:15px 20px 12px;border-bottom:1px solid var(--border);position:sticky;top:0;z-index:5;background:var(--deep);}
-.revealed-team{font-family:'Bebas Neue',sans-serif;font-size:27px;}
+.revealed-team{font-family:'Bebas Neue',sans-serif;font-size:27px;line-height:1;}
+.dec-accent{color:var(--gold);white-space:nowrap;}
 .revealed-era{font-size:12px;color:var(--muted);margin-top:2px;}
 .pick-instruction{margin-top:8px;display:inline-flex;align-items:center;gap:6px;font-family:'Rajdhani',sans-serif;font-weight:600;font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:var(--gold);}
 .pick-instruction::before{content:'';width:5px;height:5px;border-radius:50%;background:var(--gold);box-shadow:0 0 6px var(--gold);}
@@ -310,29 +315,38 @@ h1,h2,h3{font-weight:400;line-height:.95;}
   .game__pitch-title{display:block;margin:0;line-height:1.1;overflow:hidden;
     opacity:clamp(0, calc(1 - var(--p,0)*1.8), 1);
     max-height:calc((1 - var(--p,0)) * 22px);}
+  /* La cabecera EQUIPO·DÉCADA permanece SIEMPRE legible (es lo que más se
+     consulta); solo la descripción se colapsa al encoger para ganar sitio. */
+  .pitch-heading{margin-bottom:2px;}
+  .pitch-heading__team{font-size:calc(22px + (1 - var(--p,0))*4px);}
+  .pitch-heading__era{margin-top:2px;
+    opacity:clamp(0, calc(1.1 - var(--p,0)*2.2), 1);
+    max-height:calc((1 - clamp(0, calc(var(--p,0)*1.8), 1)) * 20px);overflow:hidden;}
   .live-pitch{width:calc(34vw + (1 - var(--p,0))*38vw);max-width:calc(126px + (1 - var(--p,0))*174px);
     height:auto;aspect-ratio:2/3;flex-shrink:0;transform-origin:top center;will-change:width;}
   .pnode__disc{width:calc(23px + (1 - var(--p,0))*15px);height:calc(23px + (1 - var(--p,0))*15px);
     font-size:calc(9px + (1 - var(--p,0))*3px);}
   .pnode__name{font-size:9px;max-width:58px;opacity:clamp(0, calc(1 - var(--p,0)*2), 1);}
-  /* Contexto del equipo + época anclado en el campo sticky: aparece al encoger
-     (cross-fade con la cabecera de la lista, que se va con el scroll). */
-  .pitch-context{display:flex;flex-direction:column;align-items:center;gap:1px;text-align:center;
-    opacity:clamp(0, calc(var(--p,0)*2.4 - 0.7), 1);
-    max-height:calc(clamp(0, calc(var(--p,0)*1.8), 1) * 42px);overflow:hidden;pointer-events:none;}
-  .pitch-context__team{font-family:'Bebas Neue',sans-serif;font-size:20px;line-height:1;letter-spacing:.01em;color:var(--text);}
-  .pitch-context__era{font-size:10px;color:var(--muted);line-height:1.1;}
   .revealed-header{position:static;}
-  /* La identidad en la cabecera de la lista se desvanece y colapsa al encoger,
-     para que el nombre del equipo solo se vea en UN sitio (cross-fade real). */
-  .revealed-team{opacity:clamp(0, calc(1.15 - var(--p,0)*2.4), 1);
-    max-height:calc((1 - clamp(0, calc(var(--p,0)*1.8), 1)) * 34px);overflow:hidden;}
-  .revealed-era{opacity:clamp(0, calc(1.15 - var(--p,0)*2.4), 1);
-    max-height:calc((1 - clamp(0, calc(var(--p,0)*1.8), 1)) * 20px);overflow:hidden;}
   .slots-summary{order:3;}
   .result__xi{grid-template-columns:repeat(2,1fr);}
   .modal__factors{grid-template-columns:1fr;}
   .spin-reel__team{font-size:28px;}
+  /* ===== FASE IDLE en móvil: pantalla dividida clara — campo preview arriba,
+     GIRAR protagonista centrado en la mitad inferior (no lo tapa el campo). ===== */
+  .game--idle .game__pitch-col{position:static;padding:14px 16px 10px;}
+  .game--idle .live-pitch{width:min(40vw,164px);max-width:164px;}
+  .game--idle .pnode__disc{width:24px;height:24px;font-size:9px;}
+  .game--idle .pnode__name{font-size:8px;opacity:1;max-width:48px;}
+  .game--idle .game__pitch-title{opacity:1;max-height:18px;margin:0;}
+  /* el panel ocupa el resto del viewport para centrar el botón GIRAR */
+  .game--idle .game__panel-col{min-height:calc(100dvh - var(--topbar-h,96px) - 300px);}
+  .game--idle .idle-stage{gap:22px;padding:24px 24px 40px;}
+  .game--idle .spin-btn{width:min(58vw,210px);height:min(58vw,210px);
+    box-shadow:0 0 0 1px var(--gold-dim),0 14px 50px -12px var(--gold-glow,rgba(240,192,64,.5));border-color:var(--gold-dim);}
+  .game--idle .spin-btn__icon{font-size:56px;}
+  .game--idle .spin-btn__label{font-size:26px;}
+  .game--idle .idle-hint{max-width:260px;font-size:14px;}
 }
 @media(max-width:820px) and (prefers-reduced-motion:reduce){
   /* misma intención, recorrido más suave (menos diferencia de tamaño) */
@@ -1136,7 +1150,7 @@ const TR = {
   'landing.genius.on':{es:'ACTIVADO',en:'ON',pt:'ATIVADO',fr:'ACTIVÉ'},
   'landing.genius.off':{es:'desactivado',en:'off',pt:'desativado',fr:'désactivé'},
   'landing.genius.note':{es:'En <b>modo genio</b> no verás valoraciones ni estadísticas: fichas solo con tu memoria futbolística.',en:'In <b>genius mode</b> you see no ratings or stats: sign players from memory alone.',pt:'No <b>modo génio</b> não vês avaliações nem estatísticas: contratas só de memória.',fr:'En <b>mode génie</b>, ni notes ni stats : recrute de mémoire.'},
-  'landing.stats':{es:'{t} clubes · {e} épocas · {p} jugadores',en:'{t} clubs · {e} eras · {p} players',pt:'{t} clubes · {e} épocas · {p} jogadores',fr:'{t} clubs · {e} époques · {p} joueurs'},
+  'landing.stats':{es:'{t} clubes · {e} plantillas · {p} jugadores',en:'{t} clubs · {e} squads · {p} players',pt:'{t} clubes · {e} elencos · {p} jogadores',fr:'{t} clubs · {e} effectifs · {p} joueurs'},
   'landing.s1.t':{es:'Gira',en:'Spin',pt:'Gira',fr:'Tourne'},
   'landing.s1.d':{es:'Sale un equipo y una época al azar.',en:'A random team and era come up.',pt:'Sai uma equipa e uma época ao acaso.',fr:'Une équipe et une époque au hasard.'},
   'landing.s2.t':{es:'Ficha',en:'Sign',pt:'Contrata',fr:'Recrute'},
@@ -1668,7 +1682,7 @@ function Game({ roster, onAddPlayer, onFinish, onHowto, onReset, play, genius, f
   const slotPills = Object.entries(CAPS).map(([pos,cap])=>({pos,cap,have:filled[pos]}));
 
   return (
-    <section ref={gameRef} className="screen game screen-enter" style={{'--p':0}}>
+    <section ref={gameRef} className={"screen game screen-enter"+(phase==='idle'&&!isDone?' game--idle':'')} style={{'--p':0}}>
       <div className="game__topbar" ref={topbarRef}>
         <div className="game__topbar-left">
           <div className="badge"><span className="badge__dot"></span> 38-0 · LA LIGA</div>
@@ -1690,12 +1704,13 @@ function Game({ roster, onAddPlayer, onFinish, onHowto, onReset, play, genius, f
 
       <div className="game__body">
         <div className="game__pitch-col">
-          <div className="game__pitch-title">{t('game.yourteam')}</div>
-          {(phase==='revealed'||phase==='picked') && currentSpin && (
-            <div className="pitch-context" aria-hidden="true">
-              <span className="pitch-context__team">{currentSpin.team}</span>
-              <span className="pitch-context__era">{decLabel(currentSpin.decade,lang)} · {currentSpin.era}</span>
+          {(phase==='revealed'||phase==='picked') && currentSpin ? (
+            <div className="pitch-heading">
+              <div className="pitch-heading__team">{currentSpin.team} <span className="dec-accent">· {decLabel(currentSpin.decade,lang)}</span></div>
+              <div className="pitch-heading__era">{currentSpin.era}</div>
             </div>
+          ) : (
+            <div className="game__pitch-title">{t('game.yourteam')}</div>
           )}
           <LivePitch roster={roster} slots={SLOTS}/>
         </div>
@@ -1738,8 +1753,6 @@ function Game({ roster, onAddPlayer, onFinish, onHowto, onReset, play, genius, f
             {(phase==='revealed'||phase==='picked') && currentSpin && (
               <div className="revealed-stage">
                 <div className="revealed-header">
-                  <div className="revealed-team">{currentSpin.team}</div>
-                  <div className="revealed-era">{decLabel(currentSpin.decade,lang)} · {currentSpin.era}</div>
                   {phase==='revealed' && !currentPick && anyPickable && (<div className="pick-instruction">{t('game.pick1')}</div>)}
                   {phase==='revealed' && !currentPick && !anyPickable && (<div className="pick-instruction" style={{color:'var(--fwd)'}}>{t('game.noslots')}</div>)}
                   {phase==='revealed' && !currentPick && (

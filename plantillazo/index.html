@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="es" data-theme="light">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<title>Plantillazo · El juego diario de fútbol</title>
+<meta name="description" content="Plantillazo: cada día, un equipo y una temporada. Nombra a un jugador de esa plantilla. Juego diario de fútbol, hermano de 38-0." />
+<meta name="theme-color" content="#0B5D3B" />
+
+<!-- Fuentes EXACTAS de las maquetas aprobadas:
+     Archivo (display), Fraunces (editorial italic), Inter Tight (UI), Space Mono (datos) -->
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;700;800;900&family=Fraunces:ital,opsz,wght@1,9..144,400;1,9..144,500&family=Inter+Tight:wght@400;500;600&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet" />
+
+<link rel="stylesheet" href="css/styles.css" />
+</head>
+<body>
+<canvas id="confetti" aria-hidden="true"></canvas>
+
+<div class="wrap">
+  <header class="top">
+    <button class="brand" id="brandBtn" aria-label="Plantillazo · Inicio">
+      <span class="mark">Planti<b>llazo</b></span>
+      <span class="edi" id="ediTop">Nº —</span>
+    </button>
+    <div class="controls">
+      <button class="ctrl" id="langBtn" aria-label="Cambiar idioma / Switch language">ES</button>
+      <button class="ctrl" id="themeBtn" aria-label="Cambiar tema / Toggle theme">☀︎ / ☾</button>
+    </div>
+  </header>
+
+  <nav class="viewnav" id="viewnav" aria-label="Secciones"></nav>
+
+  <main id="view" role="main"><!-- las vistas se inyectan aquí --></main>
+
+  <footer class="bot">
+    <span class="x" id="ediBot"></span>
+    <span class="x"><a href="#/report" id="reportLink">Reportar un hueco</a></span>
+  </footer>
+</div>
+
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+<!-- supabase-js v2 por CDN (auth / perfil / ranking). La clave publishable va en supabase.js -->
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+<!-- Módulos de la app (orden importa: datos -> i18n -> supabase -> game -> app) -->
+<!-- El footer (enlace "reportar" + línea de edición) y el toggle de idioma los
+     gobierna app.js (renderFooter / setLang). No duplicar aquí. -->
+<script src="js/data-demo.js"></script>
+<script src="js/data-real.js"></script>
+<script src="js/data.js"></script>
+<script src="js/i18n.js"></script>
+<script src="js/supabase.js"></script>
+<script src="js/game.js"></script>
+<script src="js/survival.js"></script>
+<script src="js/app.js"></script>
+</body>
+</html>

@@ -295,18 +295,25 @@
       const safeTerm = esc(term);
       const re = new RegExp('('+safeTerm.replace(/[.*+?^${}()|[\]\\]/g,'\\$&')+')','ig');
       menu.innerHTML = list.map((p,i)=>{
-        // XSS: escapamos SIEMPRE el nombre antes de insertar el <mark>; nunca crudo
+        // XSS: escapamos SIEMPRE los nombres antes de insertar el <mark>; nunca crudo
+        const hi = (s)=> term ? s.replace(re,'<mark>$1</mark>') : s;
+        const safeFull = esc(p.fullName || p.display);
         const safeDisp = esc(p.display);
-        const disp = term ? safeDisp.replace(re,'<mark>$1</mark>') : safeDisp;
-        // NO-SPOILER: el desplegable muestra SOLO posición + nombre (+ aka) + nacionalidad.
-        // La rareza y el club+años se RETIRARON porque revelaban la respuesta (quién
-        // estaba en la plantilla buscada). La nacionalidad no delata pertenencia.
+        // NOMBRE COMPLETO siempre; si el alias no está contenido en él (p. ej.
+        // «Nacho» en José Ignacio Fernández), se antepone el alias en negrita.
+        const aliasApart = p.display && p.fullName
+          && PLData.norm(p.fullName).indexOf(PLData.norm(p.display)) === -1;
+        const nameHtml = aliasApart
+          ? `<b class="ali">${hi(safeDisp)}</b> <span class="fn">${hi(safeFull)}</span>`
+          : hi(safeFull);
+        // NO-SPOILER: solo posición + nombre + bandera (la nacionalidad no delata
+        // pertenencia; la rareza y el club+años se retiraron porque sí lo hacían).
         const nat = p.nationality
-          ? `<span class="meta nat" title="${esc(PLi18n.t('nat_label'))}">${esc(p.nationality)}</span>`
+          ? `<span class="meta nat" title="${esc(p.nationality)}" aria-label="${esc(PLi18n.t('nat_label'))}: ${esc(p.nationality)}">${esc(PLApp.flag(p.nationality))}</span>`
           : '';
         return `<button class="opt" role="option" data-id="${p.id}" data-name="${esc(p.display)}" id="opt-${i}">
           <span class="pos">${esc(p.position||'—')}</span>
-          <span class="nm">${disp}${p.aka?` <em>(aka ${esc(p.aka)})</em>`:''}</span>
+          <span class="nm">${nameHtml}</span>
           ${nat}
         </button>`;
       }).join('');
@@ -472,7 +479,8 @@
   function renderFinished(container, animate){
     const d = st.daily, t = PLi18n.t;
     const player = st.solvedPlayerId ? PLData.getPlayer(st.solvedPlayerId) : null;
-    const playerName = player ? (player.alias || player.fullName) : '';
+    // nombre COMPLETO en el veredicto (petición de Jorge 18-jul); alias de respaldo
+    const playerName = player ? (player.fullName || player.alias) : '';
     const timeStr = PLApp.fmtTime(st.timeMs);
     const rarity = st.solved ? st.rarity : 0;
     const grid = buildShareGrid();

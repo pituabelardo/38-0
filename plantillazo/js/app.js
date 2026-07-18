@@ -20,6 +20,22 @@
     try { if(window.gtag) window.gtag('event', name, params || {}); } catch(e){}
   }
 
+  /* Bandera emoji desde el código de nacionalidad de 3 letras (estilo FIFA,
+     el que trae el dataset bdfutbol). ENG/SCO/WAL usan banderas de subdivisión
+     (tag sequences Unicode). Código desconocido -> se devuelve el código tal cual. */
+  const NAT_ISO2 = { ESP:'ES', ARG:'AR', BRA:'BR', SRB:'RS', URU:'UY', POR:'PT', NED:'NL', RUS:'RU', FRA:'FR', ROU:'RO', PAR:'PY', SWE:'SE', CRO:'HR', CMR:'CM', PER:'PE', MAR:'MA', NOR:'NO', TUR:'TR', BEL:'BE', GER:'DE', ITA:'IT', NGA:'NG', EQG:'GQ', PAN:'PA', GHA:'GH', MAD:'MG', COL:'CO', BLR:'BY', CZE:'CZ', MEX:'MX', CHI:'CL', DEN:'DK', POL:'PL', SEN:'SN', MLI:'ML', CIV:'CI', JPN:'JP', ISR:'IL', GRE:'GR', AUT:'AT', SUI:'CH', SVK:'SK', SVN:'SI', HUN:'HU', BUL:'BG', UKR:'UA', GEO:'GE', ARM:'AM', ISL:'IS', IRL:'IE', FIN:'FI', EST:'EE', LTU:'LT', LVA:'LV', ALB:'AL', KOS:'XK', MKD:'MK', MNE:'ME', BIH:'BA', VEN:'VE', ECU:'EC', BOL:'BO', CRC:'CR', HON:'HN', SLV:'SV', GUA:'GT', JAM:'JM', CAN:'CA', USA:'US', AUS:'AU', NZL:'NZ', RSA:'ZA', ANG:'AO', MOZ:'MZ', ALG:'DZ', TUN:'TN', EGY:'EG', GAB:'GA', CGO:'CG', COD:'CD', TOG:'TG', BEN:'BJ', BFA:'BF', GUI:'GN', GNB:'GW', GAM:'GM', CPV:'CV', ZIM:'ZW', ZAM:'ZM', KEN:'KE', IRN:'IR', IRQ:'IQ', KOR:'KR', CHN:'CN', UZB:'UZ', KAZ:'KZ', MTQ:'MQ', SUR:'SR', CUW:'CW', DOM:'DO', CUB:'CU', PHI:'PH', IDN:'ID' };
+  const NAT_SPECIAL = { ENG:'\u{1F3F4}\u{E0067}\u{E0062}\u{E0065}\u{E006E}\u{E0067}\u{E007F}', SCO:'\u{1F3F4}\u{E0067}\u{E0062}\u{E0073}\u{E0063}\u{E0074}\u{E007F}', WAL:'\u{1F3F4}\u{E0067}\u{E0062}\u{E0077}\u{E006C}\u{E0073}\u{E007F}' };
+  function flag(code){
+    if(!code) return '';
+    const c = String(code).toUpperCase();
+    if(NAT_SPECIAL[c]) return NAT_SPECIAL[c];
+    const iso = NAT_ISO2[c];
+    if(!iso) return c;
+    let out = '';
+    for(const ch of iso){ out += String.fromCodePoint(0x1F1E6 + ch.charCodeAt(0) - 65); }
+    return out;
+  }
+
   function toast(msg){
     const el = $('#toast'); if(!el) return;
     el.textContent = msg; el.classList.add('show');
@@ -588,7 +604,7 @@
   window.PLApp = {
     toast, confetti, reducedMotion,
     fmtTime, fmtDateShort, fmtDateLong,
-    applyClubColor, track,
+    applyClubColor, track, flag,
   };
 
   document.addEventListener('DOMContentLoaded', init);

@@ -271,6 +271,21 @@ footer.bot .x{font-family:var(--f-mono); font-size:11px; color:var(--ink-soft)}
 .howto li b{color:var(--gold)}
 .crosspromo{margin-top:24px; font-size:13px; color:var(--ink-soft); text-align:center}
 
+/* ---------- Racha local (pantalla de resultado) ---------- */
+.streakbox{display:flex; align-items:center; gap:14px; margin-top:10px;
+  background:var(--paper-2); border:1px solid var(--line); border-radius:var(--r-md);
+  padding:14px 16px}
+.streakbox .sk-fire{font-size:26px; line-height:1}
+.streakbox .sk-main{font-family:var(--f-display); font-weight:800; font-size:17px}
+.streakbox .sk-main b{font-size:22px; color:var(--gold); font-variant-numeric:tabular-nums}
+.streakbox .sk-sub{margin-top:2px; font-size:13px; color:var(--ink-soft)}
+.streakbox.broken .sk-main{font-size:15px; font-weight:700}
+
+/* CTA de registro tras la partida (anónimos) */
+.regcta{margin-top:16px; background:var(--paper-2); border:1px dashed var(--line);
+  border-radius:var(--r-md); padding:14px 16px}
+.regcta .rc-txt{margin:0 0 10px; font-size:13.5px; line-height:1.45; color:var(--ink-soft)}
+
 /* ---------- Formularios (login / registro / perfil / reportar) ---------- */
 .card{margin-top:26px; background:var(--paper-2); border:1px solid var(--line); border-radius:var(--r-md);
   box-shadow:6px 6px 0 var(--line); padding:24px 22px; position:relative}

@@ -235,16 +235,22 @@
       const safeTerm = esc(term);
       const re = new RegExp('('+safeTerm.replace(/[.*+?^${}()|[\]\\]/g,'\\$&')+')','ig');
       menu.innerHTML = list.map((p,i)=>{
+        // Igual que el diario (18-jul): nombre COMPLETO + bandera emoji.
+        const hi = (s)=> term ? s.replace(re,'<mark>$1</mark>') : s;
+        const safeFull = esc(p.fullName || p.display);
         const safeDisp = esc(p.display);
-        const disp = term ? safeDisp.replace(re,'<mark>$1</mark>') : safeDisp;
-        // NO-SPOILER (igual que el diario): SOLO posición + nombre (+ aka) + nacionalidad.
-        // Rareza y club+años retirados: revelaban quién estaba en la plantilla de la ronda.
+        const aliasApart = p.display && p.fullName
+          && PLData.norm(p.fullName).indexOf(PLData.norm(p.display)) === -1;
+        const nameHtml = aliasApart
+          ? `<b class="ali">${hi(safeDisp)}</b> <span class="fn">${hi(safeFull)}</span>`
+          : hi(safeFull);
+        // NO-SPOILER: rareza y club+años retirados (revelaban pertenencia).
         const nat = p.nationality
-          ? `<span class="meta nat" title="${esc(PLi18n.t('nat_label'))}">${esc(p.nationality)}</span>`
+          ? `<span class="meta nat" title="${esc(p.nationality)}" aria-label="${esc(PLi18n.t('nat_label'))}: ${esc(p.nationality)}">${esc(PLApp.flag(p.nationality))}</span>`
           : '';
         return `<button class="opt" role="option" data-id="${p.id}" data-name="${esc(p.display)}" id="opt-${i}">
           <span class="pos">${esc(p.position||'—')}</span>
-          <span class="nm">${disp}${p.aka?` <em>(aka ${esc(p.aka)})</em>`:''}</span>
+          <span class="nm">${nameHtml}</span>
           ${nat}
         </button>`;
       }).join('');

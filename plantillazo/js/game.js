@@ -519,6 +519,8 @@
         </section>`;
       })()}
 
+      <div id="rankbox"></div>
+
       <section class="sharecard reveal d4" id="card">
         <div class="sc-top">
           <span class="sc-mark">Planti<b>llazo</b></span>
@@ -574,6 +576,88 @@
     }
 
     if(animate && st.solved && !PLApp.reducedMotion()){ PLApp.confetti(d.team && d.team.colorPrimary); }
+
+    // Ranking del día en la pantalla de resultado (backlog #7, "envidia sana"):
+    // el anónimo ve la tabla donde PODRÍA estar (con su posición hipotética
+    // calculada con la misma ordenación que el servidor) y un motivo real para
+    // registrarse. El logado ve el top con su fila resaltada. Fire & forget.
+    loadRankbox(d);
+  }
+
+  /* ---- Ranking del día (top 5) en la pantalla de resultado ----
+     Anónimo: posición hipotética = 1 + cuántos le ganan con la ordenación del
+     servidor (rareza desc, tiempo asc). Vacío: pitch de estreno del nº 1.       */
+  async function loadRankbox(d){
+    const box = document.getElementById('rankbox');
+    if(!box || !PLSupa.isReady()) return;
+    const t = PLi18n.t;
+    let rows, me = null;
+    try {
+      rows = await PLSupa.getLeaderboardDaily(d.gameDate);
+      me = await PLSupa.getUser();
+    } catch(e){ return; } // silencioso: la pantalla de resultado ya es completa sin esto
+    if(!document.getElementById('rankbox')) return; // re-render mientras cargaba
+    rows = rows || [];
+    const anon = !me;
+
+    PLApp.track('pl_rank_view', { variant: anon ? (rows.length ? 'anon' : 'anon_empty') : 'logged', entries: rows.length });
+
+    // vacío -> pitch de "estrena el nº 1" (solo tiene sentido para anónimos;
+    // un logado con ranking vacío simplemente no ve el bloque: sin ruido)
+    if(!rows.length){
+      if(!anon) return;
+      box.innerHTML = `<section class="rankbox reveal d4">
+        <div class="rb-head"><span class="rb-tit">${esc(t('rb_empty_title'))}</span></div>
+        <p class="rb-txt">${esc(t('rb_empty_txt'))}</p>
+        <button class="btn primary full" id="rbCta">${esc(t('rb_anon_cta'))}</button>
+      </section>`;
+      wireRankCta(box, 'empty');
+      return;
+    }
+
+    const meId = me ? me.id : null;
+    const top = rows.slice(0, 5);
+    // posición hipotética del anónimo que acaba de ganar (misma ordenación que el RPC)
+    let youPos = null;
+    if(anon && st.solved){
+      youPos = 1 + rows.filter(r =>
+        (Number(r.rarity_points) > st.rarity) ||
+        (Number(r.rarity_points) === st.rarity && Number(r.time_ms) <= st.timeMs)
+      ).length;
+    }
+    const body = top.map((r, i) => {
+      const isMe = meId && r.user_id === meId;
+      return `<div class="lrow ${isMe ? 'me' : ''}">
+        <span class="pos ${i < 3 ? 'top' : ''}">${i + 1}</span>
+        <span class="usr">@${esc(r.username || 'jugador')}${isMe ? ` <small style="color:var(--ink-soft)">(${esc(t('rank_you'))})</small>` : ''}</span>
+        <span class="pts">${Math.round(Number(r.rarity_points) || 0)}</span>
+      </div>`;
+    }).join('');
+    const youRow = (youPos !== null)
+      ? `<div class="lrow me rb-you"><span class="pos">${youPos}</span><span class="usr">${esc(t('rb_you_pos', { pts: st.rarity, pos: youPos }))}</span><span class="pts">${st.rarity}</span></div>`
+      : (anon ? `<p class="rb-txt">${esc(t('rb_you_pos_lose'))}</p>` : '');
+    box.innerHTML = `<section class="rankbox reveal d4">
+      <div class="rb-head"><span class="rb-tit">${esc(t('rb_title'))}</span><span class="rb-n">${rows.length} 🏆</span></div>
+      <div class="ltable">${body}${youPos !== null ? youRow : ''}</div>
+      ${youPos === null ? youRow : ''}
+      ${anon
+        ? `<button class="btn primary full" id="rbCta">${esc(t('rb_anon_cta'))}</button>`
+        : `<button class="btn ghost full" id="rbFull">${esc(t('rb_full'))}</button>`}
+    </section>`;
+    if(anon){ wireRankCta(box, st.solved ? 'won' : 'lost'); }
+    else {
+      const b = box.querySelector('#rbFull');
+      if(b) b.addEventListener('click', () => { location.hash = '#/rank'; });
+    }
+  }
+
+  function wireRankCta(box, variant){
+    const b = box.querySelector('#rbCta');
+    if(!b) return;
+    b.addEventListener('click', () => {
+      PLApp.track('pl_rank_cta_click', { variant });
+      location.hash = '#/register';
+    });
   }
 
   /* ---- Cuenta atrás a la próxima medianoche UTC (point 7) ----

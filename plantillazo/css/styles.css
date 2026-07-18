@@ -123,6 +123,10 @@ header.top{display:flex; align-items:center; justify-content:space-between; gap:
 .opt .nm{font-family:var(--f-ui); font-weight:600; font-size:15px}
 .opt .nm em{font-family:var(--f-edit); font-style:italic; font-weight:500; color:var(--ink-soft)}
 .opt .meta{font-family:var(--f-mono); font-size:11px; color:var(--ink-soft); margin-left:auto; white-space:nowrap}
+/* desplegable con nombre completo + bandera (18-jul) */
+.opt .nm .ali{font-weight:700}
+.opt .nm .fn{color:var(--ink-soft); font-weight:500}
+.opt .meta.nat{font-size:17px; line-height:1}
 .opt .pos{font-family:var(--f-mono); font-size:10px; letter-spacing:.06em; color:var(--club-ink);
   border:1px solid var(--line); border-radius:2px; padding:2px 5px}
 .opt mark{background:color-mix(in srgb,var(--gold) 38%,transparent); color:inherit; border-radius:2px}

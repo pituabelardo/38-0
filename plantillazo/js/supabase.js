@@ -189,6 +189,9 @@
         playerId: result.guessedPlayerId || null,
         timeMs: result.timeMs || null,
         attempts: result.attempts || 0,
+        // racha local del navegador: el servidor la usa SOLO para sembrar la racha
+        // en el PRIMER resultado del usuario (puente anónimo -> cuenta).
+        claimedStreak: result.claimedStreak || 0,
       },
     });
     if(error){ console.warn('[Plantillazo] submit-guess:', error.message); return { ok:false, reason:error.message }; }

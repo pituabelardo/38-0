@@ -290,6 +290,21 @@ footer.bot .x{font-family:var(--f-mono); font-size:11px; color:var(--ink-soft)}
   border-radius:var(--r-md); padding:14px 16px}
 .regcta .rc-txt{margin:0 0 10px; font-size:13.5px; line-height:1.45; color:var(--ink-soft)}
 
+/* Ranking del día en la pantalla de resultado (backlog #7) */
+.rankbox{margin-top:16px; background:var(--paper-2); border:1px solid var(--line);
+  border-radius:var(--r-md); padding:14px 16px}
+.rankbox .rb-head{display:flex; align-items:baseline; justify-content:space-between; gap:10px}
+.rankbox .rb-tit{font-family:var(--f-display); font-weight:800; font-size:18px; letter-spacing:-.01em}
+.rankbox .rb-n{font-family:var(--f-mono); font-size:11px; color:var(--ink-soft); white-space:nowrap}
+.rankbox .ltable{margin-top:10px}
+.rankbox .lrow{padding:9px 12px}
+.rankbox .lrow .usr{font-size:14px}
+.rankbox .rb-you .usr{font-size:12.5px; font-weight:700; line-height:1.3}
+.rankbox .rb-you{border-top:2px dashed var(--line)}
+.rankbox .rb-txt{margin:10px 0 0; font-size:13.5px; line-height:1.45; color:var(--ink-soft);
+  font-family:var(--f-edit); font-style:italic}
+.rankbox .btn{margin-top:12px}
+
 /* ---------- Formularios (login / registro / perfil / reportar) ---------- */
 .card{margin-top:26px; background:var(--paper-2); border:1px solid var(--line); border-radius:var(--r-md);
   box-shadow:6px 6px 0 var(--line); padding:24px 22px; position:relative}

@@ -14,6 +14,29 @@
 <link href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;700;800;900&family=Fraunces:ital,opsz,wght@1,9..144,400;1,9..144,500&family=Inter+Tight:wght@400;500;600&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet" />
 
 <link rel="stylesheet" href="/plantillazo/css/styles.css" />
+
+<!-- GA4 (Consent Mode v2): por defecto TODO denegado; si el usuario ya aceptó
+     cookies en el dominio (clave compartida invictos_consent_v1 del draft),
+     se actualiza a granted. Misma propiedad que el draft: G-2FSG8NTVH8. -->
+<script>
+window.dataLayer = window.dataLayer || [];
+function gtag(){dataLayer.push(arguments);}
+gtag('consent', 'default', {
+  ad_storage:'denied', ad_user_data:'denied', ad_personalization:'denied',
+  analytics_storage:'denied', wait_for_update: 500
+});
+gtag('js', new Date());
+gtag('config', 'G-2FSG8NTVH8', { anonymize_ip: true });
+try {
+  if (localStorage.getItem('invictos_consent_v1') === 'granted') {
+    gtag('consent', 'update', {
+      ad_storage:'granted', ad_user_data:'granted',
+      ad_personalization:'granted', analytics_storage:'granted'
+    });
+  }
+} catch(e){}
+</script>
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-2FSG8NTVH8"></script>
 </head>
 <body>
 <canvas id="confetti" aria-hidden="true"></canvas>

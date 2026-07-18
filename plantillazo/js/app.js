@@ -571,6 +571,11 @@
         await PLData.getDailyRemote();
       } catch(e){ console.warn('[Plantillazo] preload/daily remoto falló, uso demo:', e && e.message); }
       await refreshAuth();
+      // CINTURÓN además del trigger de BD (fix 18-jul): una sesión heredada del
+      // draft llega "logada" sin pasar por register/login de esta app, así que
+      // nadie creaba su fila en pl_profiles y era invisible en el ranking.
+      // ensureProfile es idempotente y barato (fire & forget).
+      if(currentUser) PLSupa.ensureProfile();
       // si hay sesión y el reto de hoy se jugó sin guardar (p. ej. jugó anónimo y
       // luego volvió logado), lo sincroniza ahora (fire & forget, idempotente)
       if(currentUser && window.PLGame && PLGame.syncToday) PLGame.syncToday();

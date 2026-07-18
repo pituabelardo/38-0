@@ -12,7 +12,7 @@
       nav_play: 'Jugar', nav_profile: 'Perfil', nav_rank: 'Ranking',
       login: 'Entrar', logout: 'Salir',
       report: 'Reportar un hueco',
-      crosspromo: '¿Te gustan los retos? Prueba también <a href="../index.html">38-0</a>, el otro juego de la casa.',
+      crosspromo: '¿Te gustan los retos? Prueba también <a href="/draft">38-0</a>, el otro juego de la casa.',
 
       /* landing */
       hero_lede: 'Cada día, una plantilla. Tú eres el ojeador: ¿quién jugó ahí?',
@@ -168,7 +168,7 @@
       nav_play: 'Play', nav_profile: 'Profile', nav_rank: 'Leaderboard',
       login: 'Log in', logout: 'Log out',
       report: 'Report a missing player',
-      crosspromo: 'Like challenges? Try <a href="../index.html">38-0</a> too, our other game.',
+      crosspromo: 'Like challenges? Try <a href="/draft">38-0</a> too, our other game.',
 
       hero_lede: 'Every day, one squad. You’re the scout: who played there?',
       play_today: 'Play today’s challenge',

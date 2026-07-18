@@ -121,6 +121,15 @@
       rank_loading: 'Cargando ranking…',
       rank_you: 'tú',
 
+      /* ranking del día en la pantalla de resultado */
+      rb_title: 'Ranking de hoy',
+      rb_you_pos: 'Con {pts} de rareza estarías el nº {pos} de hoy',
+      rb_you_pos_lose: 'Los que aciertan entran aquí. Mañana puedes ser tú.',
+      rb_anon_cta: 'Crea tu cuenta y entra en el ranking',
+      rb_empty_title: 'El ranking de hoy está vacío',
+      rb_empty_txt: 'Nadie ha puntuado todavía. Regístrate y estrena el nº 1.',
+      rb_full: 'Ver ranking completo',
+
       /* reportar */
       report_title: 'Reportar un hueco',
       report_sub: '¿Falta un jugador o hay un error? Cuéntanoslo.',
@@ -270,6 +279,15 @@
       rank_empty: 'No scores yet. Be the first to play today!',
       rank_loading: 'Loading leaderboard…',
       rank_you: 'you',
+
+      /* today's leaderboard on the result screen */
+      rb_title: "Today's leaderboard",
+      rb_you_pos: 'With {pts} rarity you would be #{pos} today',
+      rb_you_pos_lose: 'Winners land here. Tomorrow it could be you.',
+      rb_anon_cta: 'Create your account and join the leaderboard',
+      rb_empty_title: "Today's leaderboard is empty",
+      rb_empty_txt: 'Nobody has scored yet. Sign up and claim #1.',
+      rb_full: 'See full leaderboard',
 
       report_title: 'Report a missing player',
       report_sub: 'A player missing or a mistake? Tell us.',

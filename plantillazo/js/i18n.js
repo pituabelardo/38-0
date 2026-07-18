@@ -73,6 +73,14 @@
       save_login_hint: 'Inicia sesión para guardar tu racha, insignias y aparecer en el ranking.',
       result_saved: 'Resultado guardado ✓',
 
+      /* racha local */
+      streak_now: 'Racha: ',
+      streak_next: 'Vuelve mañana y la subes a {n}.',
+      streak_broken: 'Racha rota. Mañana, partido nuevo.',
+      streak_best: 'Tu mejor racha: {n}.',
+      streak_cta: 'Blindar mi racha — crear cuenta gratis',
+      streak_cta_txt: 'Tu racha de {n} vive solo en este navegador. Crea tu cuenta para blindarla, entrar al ranking y ganar insignias.',
+
       /* login / registro */
       auth_login_title: 'Entrar',
       auth_login_sub: 'Vuelve al vestuario.',
@@ -217,6 +225,14 @@
       toast_copied: 'Copied to clipboard ✓',
       save_login_hint: 'Log in to save your streak, badges and join the leaderboard.',
       result_saved: 'Result saved ✓',
+
+      /* local streak */
+      streak_now: 'Streak: ',
+      streak_next: 'Come back tomorrow to make it {n}.',
+      streak_broken: 'Streak over. Tomorrow is a new game.',
+      streak_best: 'Your best streak: {n}.',
+      streak_cta: 'Protect my streak — create a free account',
+      streak_cta_txt: 'Your {n}-day streak only lives in this browser. Create an account to protect it, join the leaderboard and earn badges.',
 
       auth_login_title: 'Log in',
       auth_login_sub: 'Back to the dressing room.',

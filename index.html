@@ -1,0 +1,278 @@
+<!DOCTYPE html>
+<html lang="es" data-theme="dark">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<title>38-0 · El draft invicto y el Plantillazo — juegos de fútbol gratis</title>
+<meta name="description" content="38-0.es, la casa de dos juegos de fútbol: el draft 38-0 (monta el once capaz de ganar LaLiga invicto) y el Plantillazo (el reto diario: nombra a un jugador de la plantilla del día)." />
+<meta name="theme-color" content="#0a0e1a" />
+<meta name="robots" content="index,follow" />
+<link rel="canonical" href="https://38-0.es/" />
+<link rel="icon" href="/favicon.ico" sizes="48x48" />
+<link rel="icon" href="/iconos/icon-32.png" type="image/png" sizes="32x32" />
+<link rel="apple-touch-icon" href="/iconos/apple-touch-icon.png" />
+<meta property="og:type" content="website" />
+<meta property="og:site_name" content="38-0" />
+<meta property="og:title" content="38-0 · Dos juegos de fútbol: el draft invicto y el Plantillazo" />
+<meta property="og:description" content="Elige tu reto: monta el once histórico capaz de ir invicto (38-0) o adivina un jugador de la plantilla del día (Plantillazo)." />
+<meta property="og:url" content="https://38-0.es/" />
+<meta property="og:image" content="https://38-0.es/iconos/og-image.jpg" />
+<meta name="twitter:card" content="summary_large_image" />
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@graph": [
+    { "@type": "WebSite", "@id": "https://38-0.es/#website", "url": "https://38-0.es/", "name": "38-0", "inLanguage": "es" },
+    { "@type": "ItemList", "itemListElement": [
+      { "@type": "ListItem", "position": 1, "url": "https://38-0.es/plantillazo", "name": "Plantillazo — el reto diario de plantillas de LaLiga" },
+      { "@type": "ListItem", "position": 2, "url": "https://38-0.es/draft", "name": "38-0 — el draft del once invicto de LaLiga" }
+    ]}
+  ]
+}
+</script>
+<!-- GA4 (Consent Mode v2; consentimiento compartido del dominio) -->
+<script>
+window.dataLayer = window.dataLayer || [];
+function gtag(){dataLayer.push(arguments);}
+gtag('consent','default',{ad_storage:'denied',ad_user_data:'denied',ad_personalization:'denied',analytics_storage:'denied',wait_for_update:500});
+gtag('js', new Date());
+gtag('config','G-2FSG8NTVH8',{anonymize_ip:true});
+try{ if(localStorage.getItem('invictos_consent_v1')==='granted'){ gtag('consent','update',{ad_storage:'granted',ad_user_data:'granted',ad_personalization:'granted',analytics_storage:'granted'}); } }catch(e){}
+</script>
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-2FSG8NTVH8"></script>
+<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-4264118301150245" crossorigin="anonymous"></script>
+<!-- Tokens de auth de Supabase (confirmación de email del draft) llegan a la raíz:
+     se reenvían al juego, que sabe consumirlos. -->
+<script>
+try{ if(/access_token|type=recovery|error_description/.test(location.hash)){ location.replace('/draft'+location.hash); } }catch(e){}
+</script>
+
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<!-- 38-0: Bebas Neue + Rajdhani · Plantillazo: Archivo + Fraunces · UI hub: Inter Tight -->
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@700;800;900&family=Bebas+Neue&family=Fraunces:ital,opsz,wght@1,9..144,400;1,9..144,500&family=Inter+Tight:wght@400;500;600;700&family=Rajdhani:wght@500;600;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet" />
+
+<style>
+  :root{
+    /* neutros del HUB (paraguas) — sobrios para no competir con las marcas hijas */
+    --bg:#0a0e1a; --bg2:#070a14; --ink:#f3f5fb; --muted:#9aa6c7; --line:#1f2a45;
+    /* 38-0 */
+    --v-void:#05070f; --v-deep:#0a0e1a; --v-surface:#141929; --v-gold:#f0c040; --v-gold2:#ffe06e; --v-pitch:#0d3320; --v-ink:#f3f5fb; --v-muted:#a7b3d6;
+    /* Plantillazo */
+    --p-green:#0B5D3B; --p-green2:#0e7a4e; --p-paper:#f3ead7; --p-paper2:#efe2c7; --p-ink:#23201a; --p-muted:#6b6253; --p-rule:#cbbc9b;
+  }
+  html[data-theme="light"]{
+    --bg:#eef1f7; --bg2:#e4e8f1; --ink:#161a26; --muted:#5b647d; --line:#cfd6e6;
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;padding:0}
+  body{
+    background:
+      radial-gradient(920px 540px at 78% -12%, rgba(11,93,59,.18), transparent 60%),
+      radial-gradient(820px 480px at 12% 112%, rgba(70,92,134,.14), transparent 62%),
+      linear-gradient(180deg,var(--bg),var(--bg2));
+    color:var(--ink);
+    font-family:'Inter Tight',system-ui,sans-serif;
+    min-height:100dvh; display:flex; flex-direction:column;
+    -webkit-font-smoothing:antialiased;
+  }
+  .topbar{
+    display:flex; align-items:center; justify-content:space-between;
+    padding:18px clamp(16px,5vw,40px); gap:12px;
+  }
+  .house{display:flex; align-items:baseline; gap:10px; min-width:0}
+  .house .dom{font-family:'Space Mono',monospace; font-weight:700; letter-spacing:.02em; font-size:15px; color:var(--ink)}
+  .house .dot{width:6px;height:6px;border-radius:50%;background:var(--v-gold);display:inline-block;transform:translateY(-2px)}
+  .house .sub{font-size:12px;color:var(--muted);letter-spacing:.16em;text-transform:uppercase}
+  .ctrls{display:flex;gap:8px}
+  .ctrl{
+    appearance:none;border:1px solid var(--line);background:transparent;color:var(--ink);
+    font-family:'Space Mono',monospace;font-size:12px;border-radius:999px;padding:7px 12px;cursor:pointer;
+    transition:border-color .2s,background .2s,transform .12s;
+  }
+  .ctrl:hover{border-color:var(--v-gold);transform:translateY(-1px)}
+  .ctrl:focus-visible{outline:2px solid var(--v-gold);outline-offset:2px}
+
+  .hero{text-align:center; padding:clamp(18px,5vh,46px) 20px clamp(8px,2vh,18px)}
+  .kicker{font-family:'Space Mono',monospace;font-size:12px;letter-spacing:.34em;text-transform:uppercase;color:var(--muted)}
+  .hero h1{
+    margin:.4em 0 .25em; font-family:'Archivo',sans-serif; font-weight:900;
+    font-size:clamp(28px,6vw,52px); line-height:1.02; letter-spacing:-.02em;
+  }
+  .hero h1 em{font-family:'Fraunces',serif;font-style:italic;font-weight:500;color:var(--v-gold)}
+  html[data-theme="light"] .hero h1 em{color:var(--p-green)}
+  .hero p{margin:0 auto;max-width:34ch;color:var(--muted);font-size:clamp(14px,2.6vw,17px)}
+
+  .grid{
+    flex:1; display:grid; gap:clamp(16px,2.5vw,26px);
+    grid-template-columns:repeat(2,1fr);
+    padding:clamp(16px,3vh,30px) clamp(16px,5vw,40px) 10px;
+    max-width:1120px; margin:0 auto; width:100%; align-content:start;
+  }
+  @media(max-width:760px){ .grid{grid-template-columns:1fr} }
+
+  .card{
+    position:relative; border-radius:22px; overflow:hidden; isolation:isolate;
+    display:flex; flex-direction:column; min-height:340px;
+    text-decoration:none; color:inherit;
+    border:1px solid transparent; transition:transform .18s ease, box-shadow .25s ease;
+  }
+  .card:hover{transform:translateY(-4px)}
+  .card:focus-visible{outline:3px solid #fff;outline-offset:3px}
+  .card .tag{
+    position:absolute; top:16px; right:16px; z-index:3;
+    font-family:'Space Mono',monospace; font-size:10.5px; letter-spacing:.14em; text-transform:uppercase;
+    padding:5px 10px; border-radius:999px; backdrop-filter:blur(4px);
+  }
+  .card .body{position:relative; z-index:2; margin-top:auto; padding:clamp(20px,3vw,30px)}
+  .card .name{font-size:clamp(34px,6.5vw,60px); line-height:.92; margin:0}
+  .card .pitch{margin:.7em 0 1.1em; font-size:15px; max-width:30ch}
+  .card .cta{
+    display:inline-flex; align-items:center; gap:9px;
+    font-family:'Space Mono',monospace; font-size:13px; font-weight:700; letter-spacing:.02em;
+    padding:11px 18px; border-radius:999px; transition:gap .18s, transform .18s;
+  }
+  .card:hover .cta{gap:14px}
+  .card .cta svg{width:15px;height:15px}
+
+  /* ── Tarjeta 38-0 (estadio nocturno) ── */
+  .c-380{
+    background:
+      radial-gradient(120% 90% at 80% 0%, rgba(240,192,64,.16), transparent 55%),
+      linear-gradient(160deg,var(--v-surface),var(--v-void));
+    border-color:#23304f;
+    box-shadow:0 20px 50px -28px rgba(0,0,0,.9);
+  }
+  .c-380 .tag{background:rgba(240,192,64,.14);color:var(--v-gold2);border:1px solid rgba(240,192,64,.3)}
+  .c-380 .field{position:absolute;inset:0;z-index:1;opacity:.5}
+  .c-380 .field::before{content:"";position:absolute;inset:14px;border:1.5px solid rgba(240,192,64,.18);border-radius:14px}
+  .c-380 .field::after{content:"";position:absolute;left:50%;top:14px;bottom:14px;width:1.5px;background:rgba(240,192,64,.18);transform:translateX(-50%)}
+  .c-380 .name{font-family:'Bebas Neue',sans-serif;letter-spacing:.01em;color:#fff;text-shadow:0 2px 20px rgba(240,192,64,.25)}
+  .c-380 .pitch{color:var(--v-muted)}
+  .c-380 .cta{background:linear-gradient(180deg,var(--v-gold2),var(--v-gold));color:#1a1405}
+  .c-380 .scoremark{position:absolute;top:18px;left:18px;z-index:2;font-family:'Bebas Neue',sans-serif;font-size:46px;line-height:.8;color:rgba(240,192,64,.9);letter-spacing:.02em}
+
+  /* ── Tarjeta Plantillazo (dossier) ── */
+  .c-pla{
+    background:
+      repeating-linear-gradient(0deg, transparent, transparent 33px, rgba(11,93,59,.06) 33px, rgba(11,93,59,.06) 34px),
+      linear-gradient(160deg,var(--p-paper),var(--p-paper2));
+    color:var(--p-ink);
+    border:1px solid var(--p-rule);
+    box-shadow:0 20px 50px -30px rgba(11,93,59,.6);
+  }
+  .c-pla .tag{background:rgba(11,93,59,.12);color:var(--p-green);border:1px solid rgba(11,93,59,.28)}
+  .c-pla .dossier{position:absolute;top:18px;left:20px;z-index:2;font-family:'Space Mono',monospace;font-size:11px;letter-spacing:.12em;color:var(--p-muted)}
+  .c-pla .dossier b{display:block;font-family:'Fraunces',serif;font-style:italic;font-weight:500;font-size:19px;color:var(--p-green);letter-spacing:0;margin-top:3px}
+  .c-pla .name{font-family:'Archivo',sans-serif;font-weight:900;letter-spacing:-.02em;color:var(--p-green)}
+  .c-pla .name b{color:var(--p-ink)}
+  .c-pla .pitch{color:var(--p-muted)}
+  .c-pla .cta{background:var(--p-green);color:var(--p-paper)}
+  .c-pla .edge{position:absolute;left:0;top:0;bottom:0;width:6px;background:var(--p-green);z-index:2}
+
+  /* cross-promo */
+  .xpromo{
+    text-align:center; padding:6px 20px clamp(20px,4vh,34px); color:var(--muted);
+    font-size:13px; max-width:60ch; margin:0 auto;
+  }
+  .xpromo b{color:var(--ink)}
+  footer.legal{
+    text-align:center; padding:16px; color:var(--muted); font-size:11.5px;
+    border-top:1px solid var(--line); font-family:'Space Mono',monospace; letter-spacing:.03em;
+  }
+  footer.legal a{color:var(--muted)}
+  @media(prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+</head>
+<body>
+  <div class="topbar">
+    <div class="house">
+      <span class="dom">38-0<span class="dot"></span>es</span>
+      <span class="sub" data-i18n="house">Dos juegos · una casa</span>
+    </div>
+    <div class="ctrls">
+      <button class="ctrl" id="lang" aria-label="Cambiar idioma / Switch language">EN</button>
+      <button class="ctrl" id="theme" aria-label="Cambiar tema / Toggle theme">☀ / ☾</button>
+    </div>
+  </div>
+
+  <section class="hero">
+    <div class="kicker" data-i18n="kicker">Fútbol · un reto al día</div>
+    <h1 data-i18n="h1">Elige el juego de <em>hoy</em></h1>
+    <p data-i18n="lede">Dos formas distintas de demostrar cuánto sabes de fútbol. Hermanas, no iguales.</p>
+  </section>
+
+  <main class="grid">
+    <!-- Plantillazo (primero / encima) -->
+    <a class="card c-pla" href="/plantillazo" aria-label="Jugar a Plantillazo" onclick="try{gtag('event','hub_click_plantillazo')}catch(e){}">
+      <span class="edge" aria-hidden="true"></span>
+      <span class="dossier" aria-hidden="true">EL DOSSIER DEL DÍA<b>¿Quién jugó aquí?</b></span>
+      <span class="tag" data-i18n="tagpla">Reto diario</span>
+      <div class="body">
+        <h2 class="name">Planti<b>llazo</b></h2>
+        <p class="pitch" data-i18n="pitchpla">Cada día, un equipo y una temporada. Nombra a un jugador de esa plantilla en 5 intentos. Lo raro puntúa más.</p>
+        <span class="cta" data-i18n="ctapla">Jugar a Plantillazo
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+        </span>
+      </div>
+    </a>
+
+    <!-- 38-0 (después / debajo) -->
+    <a class="card c-380" href="/draft" aria-label="Jugar a 38-0" onclick="try{gtag('event','hub_click_draft')}catch(e){}">
+      <div class="field" aria-hidden="true"></div>
+      <span class="scoremark" aria-hidden="true">38·0</span>
+      <span class="tag" data-i18n="tag380">El draft invicto</span>
+      <div class="body">
+        <h2 class="name">38-0</h2>
+        <p class="pitch" data-i18n="pitch380">Ficha jugadores de cada época y monta el once capaz de ganar la liga invicto. Tu estrategia contra la historia.</p>
+        <span class="cta" data-i18n="cta380">Jugar a 38-0
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+        </span>
+      </div>
+    </a>
+  </main>
+
+  <p class="xpromo" data-i18n="xpromo">¿Ya juegas a uno? El otro te va a gustar. <b>Misma casa, dos retos.</b></p>
+
+  <section class="seointro" style="max-width:760px;margin:0 auto;padding:8px 24px 26px;color:var(--muted);font-size:13.5px;line-height:1.65">
+    <p><strong style="color:var(--ink)">38-0.es</strong> es la casa de dos juegos gratuitos de fútbol hechos con datos reales de LaLiga (temporadas 2000-01 a 2025-26 y plantillas históricas). En <a href="/plantillazo" style="color:inherit">el Plantillazo</a>, cada día sale un equipo y una temporada y tienes 5 intentos para nombrar a un jugador de esa plantilla: cuanto más raro el acierto, más puntúa, y la racha diaria se guarda con tu cuenta. En <a href="/draft" style="color:inherit">38-0, el draft invicto</a>, fichas jugadores de distintas épocas y montas el once capaz de terminar la liga invicto, 38-0, como valoran nuestras simulaciones.</p>
+    <p>¿Quieres saber más? Lee <a href="/que-es-38-0-temporada-invicta" style="color:inherit">qué significa una temporada invicta</a>, <a href="/como-jugar-38-0" style="color:inherit">cómo se juega a 38-0</a> o nuestro <a href="/articulos" style="color:inherit">archivo de artículos</a> sobre récords e historia de LaLiga: <a href="/mejores-plantillas-historia-laliga" style="color:inherit">las mejores plantillas</a>, <a href="/maximos-goleadores-historia-laliga" style="color:inherit">los máximos goleadores</a> o <a href="/racha-invicta-mas-larga-laliga" style="color:inherit">la racha invicta más larga</a>.</p>
+  </section>
+
+  <footer class="legal">
+    <span>© 2026 38-0.es</span> · <a href="/aviso-legal" data-i18n="legal">Aviso legal</a> · <a href="/privacidad">Privacidad</a> · <a href="/cookies">Cookies</a> · <a href="/terminos">Términos</a> · <a href="/contacto">Contacto</a> · <a href="/sobre">Sobre 38-0</a> · <a href="/articulos">Artículos</a>
+  </footer>
+
+<script>
+  // ── tema (persistente) ──
+  const root=document.documentElement;
+  const T=localStorage.getItem('hub_theme'); if(T) root.setAttribute('data-theme',T);
+  document.getElementById('theme').onclick=()=>{
+    const n=root.getAttribute('data-theme')==='dark'?'light':'dark';
+    root.setAttribute('data-theme',n); localStorage.setItem('hub_theme',n);
+  };
+  // ── idioma ES/EN (persistente) ──
+  const STR={
+    es:{house:'Dos juegos · una casa',kicker:'Fútbol · un reto al día',h1:'Elige el juego de <em>hoy</em>',
+        lede:'Dos formas distintas de demostrar cuánto sabes de fútbol. Hermanas, no iguales.',
+        tag380:'El draft invicto',pitch380:'Ficha jugadores de cada época y monta el once capaz de ganar la liga invicto. Tu estrategia contra la historia.',cta380:'Jugar a 38-0',
+        tagpla:'Reto diario',pitchpla:'Cada día, un equipo y una temporada. Nombra a un jugador de esa plantilla en 5 intentos. Lo raro puntúa más.',ctapla:'Jugar a Plantillazo',
+        xpromo:'¿Ya juegas a uno? El otro te va a gustar. <b>Misma casa, dos retos.</b>',legal:'Aviso legal'},
+    en:{house:'Two games · one house',kicker:'Football · one challenge a day',h1:'Pick <em>today\'s</em> game',
+        lede:'Two different ways to prove how much football you know. Sisters, not twins.',
+        tag380:'The unbeaten draft',pitch380:'Draft players from every era and build the XI that could win the league unbeaten. Your strategy vs. history.',cta380:'Play 38-0',
+        tagpla:'Daily puzzle',pitchpla:'Each day, one team and one season. Name a player from that squad in 5 tries. Rarer picks score more.',ctapla:'Play Plantillazo',
+        xpromo:'Already hooked on one? You\'ll like the other. <b>One house, two challenges.</b>',legal:'Legal notice'}
+  };
+  function setLang(l){
+    document.documentElement.lang=l;
+    for(const el of document.querySelectorAll('[data-i18n]')){const k=el.getAttribute('data-i18n'); if(STR[l][k]!=null) el.innerHTML=STR[l][k];}
+    document.getElementById('lang').textContent=l==='es'?'EN':'ES';
+    localStorage.setItem('hub_lang',l);
+  }
+  document.getElementById('lang').onclick=()=>setLang(document.documentElement.lang==='es'?'en':'es');
+  const saved=localStorage.getItem('hub_lang');
+  setLang(saved || ((navigator.language||'es').slice(0,2)==='en' ? 'en' : 'es'));
+</script>
+</body>
+</html>

@@ -31,6 +31,112 @@
     })); } catch(e){}
   }
 
+  /* ---- Racha LOCAL (localStorage) ------------------------------------------
+     El gancho de hábito para el 98% anónimo: la racha vive en el navegador
+     desde la primera partida, sin cuenta. Al iniciar sesión/registrarse se
+     SINCRONIZA con el servidor (syncToday + claimedStreak en submit-guess).
+     Reglas (fechas UTC, las mismas del reto):
+       - acierto hoy  -> si el último acierto fue AYER: racha+1; si no: racha=1
+       - fallo (5/5)  -> racha=0
+       - la racha "viva" solo cuenta si el último acierto fue hoy o ayer.
+     Clave: pl_streak_v1 = { c: racha actual, b: mejor racha, last: 'YYYY-MM-DD' }
+     Migración: si no existe, se reconstruye desde los pl_daily_* ya guardados
+     (quien jugó ayer sin cuenta no empieza de cero).                          */
+  const STREAK_KEY = 'pl_streak_v1';
+
+  function prevDateKey(key){
+    const d = new Date(key + 'T00:00:00Z');
+    d.setUTCDate(d.getUTCDate() - 1);
+    return d.toISOString().slice(0,10);
+  }
+  function saveStreakObj(s){
+    try { localStorage.setItem(STREAK_KEY, JSON.stringify(s)); } catch(e){}
+  }
+  function rebuildStreakFromHistory(){
+    // Reconstruye la racha recorriendo hacia atrás los días resueltos consecutivos.
+    const s = { c:0, b:0, last:null };
+    try {
+      const today = PLData.getDailySquad().gameDate;
+      let day = today;
+      const read = (k)=>{ try { return JSON.parse(localStorage.getItem('pl_daily_'+k) || 'null'); } catch(e){ return null; } };
+      const t = read(day);
+      if(t && t.finished && !t.solved){ saveStreakObj(s); return s; } // hoy fallado -> 0
+      if(!(t && t.solved)) day = prevDateKey(day); // hoy sin resolver: la racha puede seguir viva desde ayer
+      for(let i=0; i<400; i++){
+        const st = read(day);
+        if(st && st.solved){ s.c++; if(!s.last) s.last = day; day = prevDateKey(day); }
+        else break;
+      }
+      if(t && t.solved && !s.last) s.last = today;
+      s.b = s.c;
+    } catch(e){}
+    saveStreakObj(s);
+    return s;
+  }
+  function loadStreak(){
+    try {
+      const s = JSON.parse(localStorage.getItem(STREAK_KEY) || 'null');
+      if(s && typeof s.c === 'number') return s;
+    } catch(e){}
+    return rebuildStreakFromHistory();
+  }
+  function applyLocalStreak(solved, gameDate){
+    const s = loadStreak();
+    if(solved){
+      if(s.last === gameDate) return s;                       // ya contado hoy
+      s.c = (s.last === prevDateKey(gameDate)) ? s.c + 1 : 1; // consecutivo o reinicio
+      s.last = gameDate;
+      s.b = Math.max(s.b || 0, s.c);
+    } else {
+      s.c = 0;                                                // 5 fallos: racha rota
+    }
+    saveStreakObj(s);
+    return s;
+  }
+  /* racha "viva" para mostrar: 0 si el último acierto no es de hoy ni de ayer */
+  function liveStreak(){
+    const s = loadStreak();
+    try {
+      const today = PLData.getDailySquad().gameDate;
+      if(s.last !== today && s.last !== prevDateKey(today)) return { c:0, b:s.b||0, last:s.last };
+    } catch(e){}
+    return s;
+  }
+
+  /* ---- Sincronización al iniciar sesión (puente anónimo -> cuenta) ----
+     Si el reto de HOY ya está terminado en localStorage y el servidor aún no
+     tiene resultado, se envía ahora (con claimedStreak para que el servidor
+     SIEMBRE la racha local en el primer resultado del usuario). Lo llama
+     app.js tras login/registro y en el arranque con sesión.                   */
+  async function syncToday(){
+    try {
+      if(!PLSupa.isReady()) return;
+      if(PLData.usingSupabase && !PLData.usingSupabase()) return;
+      const user = await PLSupa.getUser();
+      if(!user) return;
+      const daily = PLData.getDailySquad();
+      if(!daily || !daily.gameDate) return;
+      const prev = loadProgress(daily.gameDate);
+      if(!prev || !prev.finished) return;
+      const existing = await PLSupa.getTodayResult(daily.gameDate);
+      if(existing) return;
+      const pid = prev.solvedPlayerId
+        || (prev.misses && prev.misses.length ? prev.misses[prev.misses.length-1].id : null);
+      if(pid == null) return;
+      const s = loadStreak();
+      const res = await PLSupa.saveResult({
+        gameDate: daily.gameDate,
+        attempts: prev.attempts || (prev.misses ? prev.misses.length : 1),
+        timeMs: prev.timeMs || null,
+        guessedPlayerId: pid,
+        claimedStreak: s.c || 0,
+      });
+      if(res && res.ok){ PLApp.toast(PLi18n.t('result_saved')); }
+    } catch(e){
+      console.warn('[Plantillazo] syncToday:', e && e.message);
+    }
+  }
+
   /* ---- Arranque de la vista de juego ---- */
   async function start(container){
     const daily = PLData.getDailySquad(); // reto global del día (determinista)
@@ -82,7 +188,10 @@
     }
 
     if(st.finished){ renderFinished(container); }
-    else { renderPlay(container); }
+    else {
+      PLApp.track('pl_play_start', { edition: daily.edition });
+      renderPlay(container);
+    }
   }
 
   /* ---- Render: estado de error con reintento ---- */
@@ -277,12 +386,15 @@
     }
 
     const correct = PLData.isInSquad(playerId, st.daily.squadId);
+    PLApp.track('pl_guess', { correct, attempt_n: st.misses.length + 1 });
     if(correct){
       st.solved = true; st.finished = true; st.solvedPlayerId = playerId;
       st.attempts = st.misses.length + 1;
       st.timeMs = Math.round(performance.now() - st.startedAt);
       st.rarity = PLData.getRarity(playerId, st.daily.squadId);
       saveProgress();
+      const sk = applyLocalStreak(true, st.daily.gameDate);
+      PLApp.track('pl_win', { attempts: st.attempts, rarity: st.rarity, streak: sk.c, time_s: Math.round(st.timeMs/1000), edition: st.daily.edition });
       persistResult();
       const c = document.getElementById('view'); renderFinished(c, true);
     } else {
@@ -301,6 +413,9 @@
         st.attempts = MAX;
         st.timeMs = Math.round(performance.now() - st.startedAt);
         saveProgress();
+        const skPrev = liveStreak().c || 0;
+        applyLocalStreak(false, st.daily.gameDate);
+        PLApp.track('pl_lose', { streak_lost: skPrev, edition: st.daily.edition });
         persistResult();
         const c = document.getElementById('view'); renderFinished(c, true);
       } else {
@@ -332,11 +447,24 @@
       // agotaron los 5 (submit-guess valida la pertenencia server-side).
       guessedPlayerId: st.solvedPlayerId
         || (st.misses.length ? st.misses[st.misses.length-1].id : null),
+      // racha local: el servidor la usa para SEMBRAR la racha en el primer
+      // resultado del usuario (puente anónimo -> cuenta, ver submit-guess).
+      claimedStreak: (loadStreak().c || 0),
     });
     if(res && res.ok){
       PLApp.toast(PLi18n.t('result_saved'));
-      // la rareza/insignias/racha autoritativas vienen del servidor. Si quisiéramos,
-      // podríamos notificar las nuevas insignias (res.newBadges) aquí.
+      // racha autoritativa del servidor: si difiere de la local, manda la del
+      // servidor en pantalla (y se refleja en localStorage para coherencia).
+      if(typeof res.currentStreak === 'number' && res.currentStreak > 0){
+        const el = document.getElementById('streakNum');
+        if(el) el.textContent = String(res.currentStreak);
+        const sub = document.getElementById('streakSub');
+        if(sub) sub.textContent = PLi18n.t('streak_next', { n: res.currentStreak + 1 });
+        try {
+          const s = loadStreak();
+          if(res.currentStreak > (s.c||0)){ s.c = res.currentStreak; s.b = Math.max(s.b||0, s.c); saveStreakObj(s); }
+        } catch(e){}
+      }
     }
   }
 
@@ -363,6 +491,26 @@
         <div class="stat try"><div class="k">${esc(t('kTry'))}</div><div class="v">${st.attempts}</div></div>
       </section>
 
+      ${(function(){
+        const s = liveStreak();
+        if(st.solved){
+          return `<section class="streakbox reveal d3" id="streakBox">
+            <span class="sk-fire" aria-hidden="true">🔥</span>
+            <div class="sk-txt">
+              <div class="sk-main">${esc(t('streak_now',{n:''}))}<b id="streakNum">${s.c}</b></div>
+              <div class="sk-sub" id="streakSub">${esc(t('streak_next',{n:s.c+1}))}</div>
+            </div>
+          </section>`;
+        }
+        return `<section class="streakbox broken reveal d3" id="streakBox">
+          <span class="sk-fire" aria-hidden="true">🧊</span>
+          <div class="sk-txt">
+            <div class="sk-main">${esc(t('streak_broken'))}</div>
+            ${s.b ? `<div class="sk-sub">${esc(t('streak_best',{n:s.b}))}</div>` : ''}
+          </div>
+        </section>`;
+      })()}
+
       <section class="sharecard reveal d4" id="card">
         <div class="sc-top">
           <span class="sc-mark">Planti<b>llazo</b></span>
@@ -387,7 +535,10 @@
         <button class="btn ghost cd-notify" id="notifyBtn">${esc(t('notify_me'))}</button>
       </section>
 
-      <p class="crosspromo reveal d4" id="loginHint" hidden>${esc(t('save_login_hint'))}</p>
+      <section class="regcta reveal d4" id="regCta" hidden>
+        <p class="rc-txt" id="regCtaTxt"></p>
+        <button class="btn primary full" id="regCtaBtn">${esc(t('streak_cta'))}</button>
+      </section>
     `;
 
     $('#shareBtn').addEventListener('click', ()=> doShare(grid.text));
@@ -395,9 +546,23 @@
     startCountdown();
     wireNotify();
 
-    // muestra el aviso de "inicia sesión para guardar" solo si no hay sesión
+    // CTA de registro SOLO para anónimos, en el momento de máxima motivación:
+    // acaba de ganar y tiene una racha local que "blindar" (el puente a la cuenta).
     if(PLSupa.isReady()){
-      PLSupa.getUser().then(u=>{ if(!u){ const h=$('#loginHint'); if(h) h.hidden=false; } });
+      PLSupa.getUser().then(u=>{
+        if(u) return;
+        const box = $('#regCta'), txt = $('#regCtaTxt'), btn = $('#regCtaBtn');
+        if(!box || !txt || !btn) return;
+        const s = liveStreak();
+        txt.textContent = (st.solved && s.c >= 1)
+          ? t('streak_cta_txt', { n: s.c })
+          : t('save_login_hint');
+        box.hidden = false;
+        btn.addEventListener('click', ()=>{
+          PLApp.track('pl_streak_cta_click', { streak: s.c });
+          location.hash = '#/register';
+        });
+      });
     }
 
     if(animate && st.solved && !PLApp.reducedMotion()){ PLApp.confetti(d.team && d.team.colorPrimary); }
@@ -437,6 +602,7 @@
     // refleja estado previo
     try { if(localStorage.getItem('pl_notify_optin') === '1'){ btn.textContent = PLi18n.t('notify_on'); btn.classList.add('on'); } } catch(e){}
     btn.addEventListener('click', async ()=>{
+      PLApp.track('pl_notify_optin', {});
       // TODO(servidor): registrar el opt-in real (email/push) en pl_profiles / Edge Function.
       try { localStorage.setItem('pl_notify_optin', '1'); } catch(e){}
       if('Notification' in window){
@@ -480,11 +646,11 @@
   }
 
   function toast(){ PLApp.toast(PLi18n.t('toast_copied')); }
-  async function doCopy(txt){ try{ await navigator.clipboard.writeText(txt); }catch(e){} toast(); }
+  async function doCopy(txt){ PLApp.track('pl_share', { method:'copy' }); try{ await navigator.clipboard.writeText(txt); }catch(e){} toast(); }
   async function doShare(txt){
-    if(navigator.share){ try{ await navigator.share({ text: txt }); return; }catch(e){} }
+    if(navigator.share){ try{ PLApp.track('pl_share', { method:'native' }); await navigator.share({ text: txt }); return; }catch(e){} }
     doCopy(txt);
   }
 
-  window.PLGame = { start, _state: ()=>st };
+  window.PLGame = { start, syncToday, _state: ()=>st, _streak: liveStreak };
 })();

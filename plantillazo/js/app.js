@@ -14,6 +14,12 @@
   /* ------------------------------------------------------------------ utils */
   function reducedMotion(){ return window.matchMedia('(prefers-reduced-motion: reduce)').matches; }
 
+  /* GA4 — no-op silencioso si gtag no cargó (offline / bloqueadores).
+     Eventos propios del diario con prefijo pl_ para no mezclarse con el draft. */
+  function track(name, params){
+    try { if(window.gtag) window.gtag('event', name, params || {}); } catch(e){}
+  }
+
   function toast(msg){
     const el = $('#toast'); if(!el) return;
     el.textContent = msg; el.classList.add('show');
@@ -144,6 +150,7 @@
     const c = $('#view');
     renderHeaderNav();
     renderFooter();
+    track('pl_view', { view });
 
     try {
       switch(view){
@@ -293,6 +300,9 @@
         if(!email || !password){ showMsg('err', t('err_fields')); return; }
         await PLSupa.login({ email, password });
         await refreshAuth();
+        track('login', { method: 'plantillazo' });
+        // sincroniza el resultado/racha de HOY jugado como anónimo (fire & forget)
+        if(window.PLGame && PLGame.syncToday) PLGame.syncToday();
         location.hash = '#/profile';
       }
       else if(mode === 'register'){
@@ -307,6 +317,10 @@
         const by = $('#birthyear').value ? Number($('#birthyear').value) : null;
         await PLSupa.register({ email, username, password, favoriteTeamId:favteam, country, birthYear:by });
         await refreshAuth();
+        // sign_up estándar de GA4 (cablea el embudo de registro del diario)
+        track('sign_up', { method: 'plantillazo' });
+        // sincroniza el resultado/racha de HOY jugado como anónimo (fire & forget)
+        if(currentUser && window.PLGame && PLGame.syncToday) PLGame.syncToday();
         if(currentUser){ location.hash = '#/profile'; }
         else { showMsg('ok', t('msg_register_ok')); }
       }
@@ -541,6 +555,9 @@
         await PLData.getDailyRemote();
       } catch(e){ console.warn('[Plantillazo] preload/daily remoto falló, uso demo:', e && e.message); }
       await refreshAuth();
+      // si hay sesión y el reto de hoy se jugó sin guardar (p. ej. jugó anónimo y
+      // luego volvió logado), lo sincroniza ahora (fire & forget, idempotente)
+      if(currentUser && window.PLGame && PLGame.syncToday) PLGame.syncToday();
       // recuperación de contraseña: Supabase dispara PASSWORD_RECOVERY al volver del email
       PLSupa.onAuthChange((session, event)=>{
         currentUser = session ? session.user : null;
@@ -571,7 +588,7 @@
   window.PLApp = {
     toast, confetti, reducedMotion,
     fmtTime, fmtDateShort, fmtDateLong,
-    applyClubColor,
+    applyClubColor, track,
   };
 
   document.addEventListener('DOMContentLoaded', init);
